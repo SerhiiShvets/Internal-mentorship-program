@@ -55,31 +55,28 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
         {
             throw new NotImplementedException();
         }
-             //           || counterToCheckWhetherItIsOddOrEven <= quantity
+
         public bool MoveNext()
         {
             if (counter < quantity-1)
             {
-                if (counterToCheckWhetherItIsOddOrEven % 2 != 0 && position < timeSlots.Length - 2)
+                if (counterToCheckWhetherItIsOddOrEven % 2 != 0 && position < timeSlots.Length - 1)
                 {
-                    position++;
+                    if (position < timeSlots.Length - 1)
+                    {
+                        position++;
+                    }
                     counter++;
-                    counterToCheckWhetherItIsOddOrEven++;
-                    Console.WriteLine("position is " + position);
-                    Console.WriteLine("counter is " + counterToCheckWhetherItIsOddOrEven);
-                    Console.WriteLine(timeSlots[position]);
+                    counterToCheckWhetherItIsOddOrEven++;                    
                     freeSlots.Add(timeSlots[position]);
                     return true;
                 }
-                else if (positionToGoBack >= 1 && counterToCheckWhetherItIsOddOrEven % 2 == 0)
+                if (counterToCheckWhetherItIsOddOrEven % 2 == 0 && positionToGoBack >= 1)
                 {
                     positionToGoBack--;
                     counter++;
                     counterToCheckWhetherItIsOddOrEven++;
-                    Console.WriteLine("positionToGoBack i " + positionToGoBack);
-                    Console.WriteLine("counter is " + counterToCheckWhetherItIsOddOrEven);
-                    Console.WriteLine(timeSlots[positionToGoBack]);
-                    freeSlots.Add(timeSlots[position]);
+                    freeSlots.Add(timeSlots[positionToGoBack]);
                     return true;
                 }
                 else
@@ -87,7 +84,6 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
                     counterToCheckWhetherItIsOddOrEven++;
                     return true;
                 }
-                //return false;
             }
             return false;
         }
