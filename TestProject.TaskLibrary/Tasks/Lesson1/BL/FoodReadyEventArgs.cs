@@ -7,9 +7,13 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
     public class FoodReadyEventArgs
     {
         public string Message { get; }
-        public FoodReadyEventArgs(Order order)
+        public string Food { get; }
+        IEnumerable<string> Extras { get; }
+        public FoodReadyEventArgs(string message, string food, IEnumerable<string> extras)
         {
-            Message = order.Food+"and"+order.Extras+"are ready";
+            Food = food;
+            Extras = extras;
+            Message = message;
 
         }
     }

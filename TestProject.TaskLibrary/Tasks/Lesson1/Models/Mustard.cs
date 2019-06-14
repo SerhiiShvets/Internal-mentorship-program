@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TestProject.Common.Core.Interfaces;
 
 namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
 {
-    class HotDog : Food
+    class Mustard : Extra
     {
         public override double CalculateHappiness(double happiness)
         {
-            return happiness + 2;
+            return happiness + Effect;
         }
 
-        public HotDog() 
+        public Mustard(Food food) : base (food)
         {
-            
+            Effect = 1;
+            food.Effect *= 0;
+            MainFood = food;
         }
     }
 }

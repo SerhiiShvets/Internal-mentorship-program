@@ -7,13 +7,18 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
 {
     class TreeItem <T, V>
     {
-        public V value;
-        public V parent;
+        private const string _cross = " ├─";
+        private const string _corner = " └─";
+        private const string _vertical = " │ ";
+        private const string _space = "   ";
+
+        public V Value { get; set; }
+        public V Parent { get; set;  }
         public Dictionary<T, V> children;
 
         public TreeItem(V value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         public DirectoryInfo[] GetDirectoriesInDirectory(string path)
@@ -35,31 +40,80 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
         //public void GetChildren(V treeItemValue)
         //{   }
 
-        public void GetChildren(string treeItemValue)
+            public void CompareDirectories()
         {
-            Console.WriteLine(treeItemValue);
 
+        }
+
+        public void GetChildren(string treeItemValue, string indent)
+        {
             var gotDirectories = GetDirectoriesInDirectory(treeItemValue);
             var gotFiles = GetFilesInDirectory(treeItemValue);
 
+            indent = indent+_space;
             foreach (DirectoryInfo dir in gotDirectories)
             {
+                
+                if (dir.Name == gotDirectories[gotDirectories.Length-1].Name)
+                {
+                    Console.Write(indent+_corner );
+                    //Console.Write(_corner);
+                    //indent += _space;
+                }
+                else
+                {
+                    Console.Write(indent+_cross);
+                    //Console.Write(_cross);
+                    //indent += _vertical;
+                    //indent += _space;
+                }
                 Console.WriteLine(dir.ToString());
                 gotDirectories = GetDirectoriesInDirectory(dir.ToString());
-                gotFiles = GetFilesInDirectory(dir.ToString());
+                FileInfo[] gotFilesNext = GetFilesInDirectory(dir.ToString());
+                indent = indent + _space;
                 foreach (DirectoryInfo d in gotDirectories)
                 {
+                    //if(d == gotDirectories[gotDirectories.Length-1])
+                    Console.Write(indent);
                     Console.WriteLine(d.ToString());
-                    GetChildren(d.ToString());
+                    GetChildren(d.ToString(), indent);
                 }
-                foreach (FileInfo file in gotFiles)
+                foreach (FileInfo file in gotFilesNext)
                 {
+                    if (file.Name == gotFilesNext[gotFilesNext.Length - 1].Name)
+                    {
+                        Console.Write(indent + _corner);
+                        //Console.Write(_corner);
+                        //indent += _space;
+                    }
+                    else
+                    {
+                        Console.Write(indent + _cross);
+                        //Console.Write(_cross);
+                        //indent += _vertical;
+                        //indent += _space;
+                    }
+                    //Console.Write(indent);
                     Console.WriteLine(file.ToString());
                 }
 
             }
             foreach (FileInfo file in gotFiles)
             {
+                if (file.Name == gotFiles[gotFiles.Length - 1].Name)
+                {
+                    Console.Write(_corner);
+                    //Console.Write(_corner);
+                    //indent += _space;
+                }
+                else
+                {
+                    Console.Write(_cross);
+                    //Console.Write(_cross);
+                    //indent += _vertical;
+                    //indent += _space;
+                }
+                //Console.Write(indent);
                 Console.WriteLine(file.ToString());
             }
         }

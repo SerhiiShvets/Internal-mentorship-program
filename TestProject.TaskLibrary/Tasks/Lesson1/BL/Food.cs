@@ -7,11 +7,13 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
 {
     public abstract class Food : IFood
     {
+        public double Effect { get; set; }
+
         public abstract double CalculateHappiness(double happiness);
 
         public Food()
         {
-
+            
         }
     }
 }

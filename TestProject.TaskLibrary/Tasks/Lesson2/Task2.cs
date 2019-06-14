@@ -8,6 +8,8 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
 {
     public class Task2 : IRunnable
     {
+       
+
         public void Run()
         {
             //Console.WriteLine("Please, input the path to the directory you want to explore");
@@ -21,12 +23,15 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
 
             string parent = dInfo.Parent.ToString();
 
-            treeItem.value = path;
-            treeItem.parent = parent;
-
-            treeItem.GetChildren(path);
+            treeItem.Value = path;
+            treeItem.Parent = parent;
+            string indent = "";
+            Console.WriteLine(path);
+            treeItem.GetChildren(path, indent);
             Console.ReadKey();
 
         }
+
+       
     }  
 }
