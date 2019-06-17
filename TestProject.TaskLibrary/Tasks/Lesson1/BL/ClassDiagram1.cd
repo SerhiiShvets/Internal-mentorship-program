@@ -43,14 +43,14 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Delegate Name="TestProject.TaskLibrary.Tasks.Lesson1.BL.Order.FoodReady">
+      <Delegate Name="TestProject.TaskLibrary.Tasks.Lesson1.BL.Order.EventHandler">
         <TypeIdentifier>
           <NewMemberFileName>Tasks\Lesson1\BL\Order.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAEAAAAAAACEAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAACEAAAAAgAAAAAAAAAAAAAAABAAAA=</HashCode>
       <FileName>Tasks\Lesson1\BL\Order.cs</FileName>
     </TypeIdentifier>
   </Class>

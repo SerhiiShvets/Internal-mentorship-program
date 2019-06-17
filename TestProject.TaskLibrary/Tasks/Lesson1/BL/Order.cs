@@ -14,15 +14,15 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
 
 
 
-        public delegate void FoodReady(object sender, FoodReadyEventArgs e);
+        public delegate void EventHandler(object sender, FoodReadyEventArgs e);
 
-        public event FoodReady FoodCooked;
+        public event EventHandler FoodReady;
 
         public void NotifyReady(IFood food)
         {
-            if (FoodCooked != null)
+            if (FoodReady != null)
             {
-                FoodCooked(this, new FoodReadyEventArgs
+                FoodReady(this, new FoodReadyEventArgs
                     ($"Notifying observers of Order[food={FoodToOrder}, extras={ExtrasForAdding}]", FoodToOrder, ExtrasForAdding));
             }
         }

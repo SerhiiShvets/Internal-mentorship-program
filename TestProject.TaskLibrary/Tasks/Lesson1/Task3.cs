@@ -34,6 +34,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1
             waitressRobot.ServeOrders();
 
             kitchen.Cook(waitressRobot.orders.Dequeue());
+            //order1.FoodReady += order1.NotifyReady();
             
 
         }

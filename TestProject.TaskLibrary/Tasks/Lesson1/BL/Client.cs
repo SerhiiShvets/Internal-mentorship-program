@@ -18,6 +18,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
 
         public void Eat(IFood food)
         {
+            
             Console.WriteLine($"Starting to eat food, client: Client [name={Name}, happiness={Happiness}], food: {food as Extra} [food={food.GetType()}]");
             food.CalculateHappiness(Happiness);
         }
