@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
 {
-    class HotDog : Food
+    public class HotDog : Food
     {
 
         public override double CalculateHappiness(double happiness)

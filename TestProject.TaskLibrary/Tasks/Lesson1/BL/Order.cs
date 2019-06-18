@@ -26,9 +26,9 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
                     ($"Notifying observers of Order[food={FoodToOrder}, extras={ExtrasForAdding}]", FoodToOrder, ExtrasForAdding));
             }
         }
-        public Order(string food/*, IEnumerable<string> extras*/)
+        public Order(string food, IEnumerable<string> extras)
         {
-            //Extras = extras;
+            ExtrasForAdding = extras;
             FoodToOrder = food;
         }
 

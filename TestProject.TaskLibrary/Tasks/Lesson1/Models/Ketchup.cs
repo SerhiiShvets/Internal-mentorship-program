@@ -10,13 +10,13 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
 
         public override double CalculateHappiness(double happiness)
         {
+            Effect = MainFood.Effect * 2;
             return happiness + Effect;
         }
 
-        public Ketchup(Food food) : base(food)
+        public Ketchup(IFood food) : base(food)
         {
-            Effect = food.Effect * 2;
-            MainFood = food;
+            MainFood = (Food)food;
         }
     }
 }

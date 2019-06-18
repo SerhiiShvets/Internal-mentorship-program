@@ -13,10 +13,11 @@ namespace TestProject
             {
                 //new TaskLibrary.Tasks.Lesson1.Task1(),
                 //new TaskLibrary.Tasks.Lesson1.Task2(),
+                new TaskLibrary.Tasks.Lesson1.Task3(),
                 //new TaskLibrary.Tasks.Lesson2.Task1(), 
                 //new TaskLibrary.Tasks.Lesson2.Task2(),
                 //new TaskLibrary.Tasks.Lesson3.Task1(),
-                new TaskLibrary.Tasks.Lesson3.Task2(),
+                //new TaskLibrary.Tasks.Lesson3.Task2(),
             };
 
             foreach (var task in tasks)

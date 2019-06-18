@@ -8,10 +8,11 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
     {
         public Queue<Order> orders;
         public Kitchen Kitchen { get; }
-        //?????Why do we take Kitchen as a parameter?
+
         public Waitress(Kitchen kitchen)
         {
             Kitchen = kitchen;
+            orders = new Queue<Order>();
         }
 
         public void ServeOrders()
@@ -22,8 +23,8 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
         {
             orders.Enqueue(order);
             Console.WriteLine("Order registered, client: Client [name = " + 
-                client.Name + "happiness = " + client.Happiness + 
-                "], order: Order [food = " + order.FoodToOrder +", extra = "+ order.ExtrasForAdding);
+                client.Name + " happiness = " + client.Happiness + 
+                "], order: Order [food = " + order.FoodToOrder +", extra = "+ string.Join(" ", order.ExtrasForAdding));
         }
     }
 }

@@ -10,38 +10,42 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
         public IFood mainFood;
         public IFood extrasToAdd;
 
-        //I am not sure this is a good way to implement AddExtras(), Cook() and CreateMainFood()
-        public IFood AddExtras(IFood mainFood, IEnumerable<string> extras)
+        private Dictionary<string, Func<IFood, IFood>> ExtrasCooker = new Dictionary<string, Func<IFood, IFood>>
         {
-            if(extras.ToString() == "MUSTARD")
-            {
-                return new Mustard((Food)mainFood);
-            }
-            if(extras.ToString() == "KETCHUP")
-            {
-                return new Ketchup((Food)mainFood);
-            }
-            return null;
-        }
-        public IFood Cook(Order order)
+            { "MUSTARD", food => new Mustard(food) },
+            { "KETCHUP", food => new Ketchup(food) }
+        };
+
+        private Dictionary<string, Func<IFood>> MainFoodCooker = new Dictionary<string, Func<IFood>>
         {
-            Console.WriteLine($"Preparing food, order: Order[food={order.FoodToOrder}, extras=[{order.ExtrasForAdding}]]");
-            mainFood = CreateMainFood(order.FoodToOrder);
-            extrasToAdd = AddExtras(mainFood, order.ExtrasForAdding);
-            Console.WriteLine($"Food prepared, food: {extrasToAdd}[{mainFood}[]]");
-            return extrasToAdd;
-        }
+            { "HOTDOG", () => new HotDog() },
+            { "CHIPS", () => new Chips() }
+        };
+
         public IFood CreateMainFood(string food)
         {
-            if(food == "HOTDOG")
-            {
-                return new HotDog();
-            }
-            else
-            {
-                return new Chips();
-            }
+            var result = MainFoodCooker[food]();
+
+            return result;
         }
 
+        public IFood AddExtras(IFood mainFood, IEnumerable<string> extras)
+        {
+            var result = mainFood;
+            foreach (var extra in extras)
+            {
+                result = ExtrasCooker[extra](result);
+            }
+            return result;
+        }
+
+        public IFood Cook(Order order)
+        {
+            Console.WriteLine($"Preparing food, order: Order[food={order.FoodToOrder}, extras=["+string.Join(" ", order.ExtrasForAdding)+"]]");
+            mainFood = CreateMainFood(order.FoodToOrder);
+            extrasToAdd = AddExtras(mainFood, order.ExtrasForAdding);
+            Console.WriteLine($"Food prepared, food: "+string.Join(" ", extrasToAdd)+$"[{mainFood}[]]");
+            return extrasToAdd;
+        }
     }
 }

@@ -7,7 +7,7 @@ using TestProject.TaskLibrary.Tasks.Lesson1.BL;
 
 namespace TestProject.TaskLibrary.Tasks.Lesson1
 {
-    class Task3 : IRunnable
+    public class Task3 : IRunnable
     {
         
         public void Run()
@@ -19,14 +19,12 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1
             Kitchen kitchen = new Kitchen();
             Waitress waitressRobot = new Waitress(kitchen);
 
-            Order order1 = new Order("CHIPS");
-            //???For some reason this implementation of IEnumerable doesnt work
-            //order1.ExtrasForAdding = new IEnumerable<string> { "MUSTARD" };
+            Order order1 = new Order("CHIPS", new List<string> { "MUSTARD" });
+
             order1.ExtrasForAdding = new List<string> { "MUSTARD" };
             //to do
             // implement event
-            Order order2 = new Order("HOTDOG");
-            order2.ExtrasForAdding = new List<string> { "KETCHUP" };
+            Order order2 = new Order("HOTDOG", new List<string> {"KETCHUP"});
 
 
             waitressRobot.TakeOrder(client1, order1);
@@ -34,6 +32,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1
             waitressRobot.ServeOrders();
 
             kitchen.Cook(waitressRobot.orders.Dequeue());
+
             //order1.FoodReady += order1.NotifyReady();
             
 
