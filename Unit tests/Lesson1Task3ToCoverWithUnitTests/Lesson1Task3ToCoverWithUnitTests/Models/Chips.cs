@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
+namespace Lesson1Task3ToCoverWithUnitTests
 {
     public class Chips : Food
     {
-        
         public override double CalculateHappiness(double happiness)
         {
             Effect = happiness * 0.05;

@@ -17,5 +17,9 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
         {
 
         }
+        public override string ToString()
+        {
+            return "Hotdog";
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
     {
         public override double CalculateHappiness(double happiness)
         {
+            MainFood.CalculateHappiness(happiness);
             Effect = 1;
             MainFood.Effect *= 0;
             return happiness + Effect;
@@ -17,6 +18,10 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
         public Mustard(IFood food) : base (food)
         {
             MainFood = (Food)food;
+        }
+        public override string ToString()
+        {
+            return $"food={MainFood.ToString()}, extras=[Mustard]";
         }
     }
 }

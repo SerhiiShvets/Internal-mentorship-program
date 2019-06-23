@@ -15,7 +15,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
             //Console.WriteLine("Please, input the path to the directory you want to explore");
             string path = "C:\\Users\\Сергій\\Documents\\temp"; //Console.ReadLine();
 
-            TreeItem<int, string> treeItem = new TreeItem<int, string>(path);
+            TreeItem<string> treeItem = new TreeItem<string>(path);
             DirectoryInfo dInfo = new DirectoryInfo(path);
             DirectoryInfo[] directories = treeItem.GetDirectoriesInDirectory(path);
             FileInfo[] files = treeItem.GetFilesInDirectory(path);
@@ -24,7 +24,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
             string parent = dInfo.Parent.ToString();
 
             treeItem.Value = path;
-            treeItem.Parent = parent;
+            treeItem.Parent = new TreeItem<string>(parent);
             string indent = "";
             Console.WriteLine(path);
             treeItem.GetChildren(path, indent);

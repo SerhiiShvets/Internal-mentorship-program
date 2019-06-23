@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace TestProject.TaskLibrary.Tasks.Lesson2
 {
-    class TreeItem <T, V>
+
+
+
+    class TreeItem <V>
     {
         private const string _cross = " ├─";
         private const string _corner = " └─";
@@ -13,8 +17,8 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
         private const string _space = "   ";
 
         public V Value { get; set; }
-        public V Parent { get; set;  }
-        public Dictionary<T, V> children;
+        public TreeItem<V> Parent { get; set;  }
+        public IEnumerable<TreeItem<V>> children;
 
         public TreeItem(V value)
         {
@@ -54,7 +58,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson2
             foreach (DirectoryInfo dir in gotDirectories)
             {
                 
-                if (dir.Name == gotDirectories[gotDirectories.Length-1].Name)
+                if (dir.Name == gotDirectories.Last().Name)
                 {
                     Console.Write(indent+_corner );
                     //Console.Write(_corner);

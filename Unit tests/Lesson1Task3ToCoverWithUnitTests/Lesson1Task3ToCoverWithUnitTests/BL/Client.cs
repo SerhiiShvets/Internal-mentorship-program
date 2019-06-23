@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using TestProject.Common.Core.Interfaces;
+using System.Threading.Tasks;
 
-namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
+namespace Lesson1Task3ToCoverWithUnitTests
 {
     public class Client
     {
@@ -29,7 +30,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
             Console.WriteLine($"Food eaten, client: Client name={Name}, happiness={Happiness}");
         }
 
-        void HandleCustomEvent (object sender, FoodReadyEventArgs e)
+        void HandleCustomEvent(object sender, FoodReadyEventArgs e)
         {
             Eat(e.thisFood);
         }

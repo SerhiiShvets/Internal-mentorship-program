@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using TestProject.Common.Core.Interfaces;
+using System.Threading.Tasks;
 
-namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
+namespace Lesson1Task3ToCoverWithUnitTests
 {
-    class Ketchup : Extra
+    public class Ketchup : Extra
     {
-
         public override double CalculateHappiness(double happiness)
         {
             MainFood.CalculateHappiness(happiness);

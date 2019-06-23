@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using TestProject.Common.Core.Interfaces;
+using System.Threading.Tasks;
 
-namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
+namespace Lesson1Task3ToCoverWithUnitTests
 {
-    public abstract class Extra : IFood
+    public abstract class Extra : IFood 
     {
         public double Effect { get; set; }
         public Food MainFood { get; set; }
@@ -17,6 +18,5 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
         {
             MainFood = (Food)food;
         }
-        
     }
 }

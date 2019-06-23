@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using TestProject.Common.Core.Interfaces;
+using System.Threading.Tasks;
 
-namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
+namespace Lesson1Task3ToCoverWithUnitTests
 {
     public class Kitchen
     {
@@ -42,12 +43,11 @@ namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
         public IFood Cook(Order order)
         {
             IFood food;
-            Console.WriteLine($"Preparing food, order: Order[food={order.FoodToOrder}, extras=["+string.Join(" ", order.ExtrasForAdding)+"]]");
+            Console.WriteLine($"Preparing food, order: Order[food={order.FoodToOrder}, extras=[" + string.Join(" ", order.ExtrasForAdding) + "]]");
             food = CreateMainFood(order.FoodToOrder);
             food = AddExtras(food, order.ExtrasForAdding);
             order.NotifyReady(food);
             return food;
         }
-
     }
 }

@@ -1,27 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using TestProject.Common.Core.Interfaces;
+using System.Threading.Tasks;
 
-namespace TestProject.TaskLibrary.Tasks.Lesson1.BL
+namespace Lesson1Task3ToCoverWithUnitTests
 {
-    class Ketchup : Extra
+    public class Mustard : Extra
     {
-
         public override double CalculateHappiness(double happiness)
         {
             MainFood.CalculateHappiness(happiness);
-            Effect = MainFood.Effect * 2;
+            Effect = 1;
+            MainFood.Effect *= 0;
             return happiness + Effect;
         }
 
-        public Ketchup(IFood food) : base(food)
+        public Mustard(IFood food) : base(food)
         {
             MainFood = (Food)food;
         }
         public override string ToString()
         {
-            return $"food={MainFood.ToString()}, extras=[Ketchup]";
+            return $"food={MainFood.ToString()}, extras=[Mustard]";
         }
     }
 }
