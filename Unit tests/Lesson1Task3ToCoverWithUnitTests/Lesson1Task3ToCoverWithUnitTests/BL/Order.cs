@@ -28,9 +28,9 @@ namespace Lesson1Task3ToCoverWithUnitTests
 
         public void NotifyReady(IFood food)
         {
-            Console.WriteLine($"Food prepared, food: " + food.ToString());
-            Console.WriteLine($"Notifying observers of Order: [food={FoodToOrder}, extras=" + string.Join(" ", ExtrasForAdding) + "]");
+            Console.WriteLine($"Order: Notifying observers of Order: [food={FoodToOrder}, extras=" + string.Join(" ", ExtrasForAdding) + "]");
             OnFoodReady(new FoodReadyEventArgs(food));
+            Console.WriteLine("Order: Notification done");
         }
         public Order(string food, IEnumerable<string> extras)
         {

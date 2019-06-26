@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lesson1Task3ToCoverWithUnitTests
 {
-    public class Waitress
+    public class Waitress : IWaitressMethods
     {
         public Queue<Order> orders;
         public Kitchen Kitchen { get; }
@@ -19,14 +19,20 @@ namespace Lesson1Task3ToCoverWithUnitTests
 
         public void ServeOrders()
         {
-            Console.WriteLine($"Processing {orders.Count} order(s)...");
+            Console.WriteLine($"WaitressRobot: Processing {orders.Count} order(s)...");
+            while (orders.Count > 0)
+            {
+                Kitchen.Cook(orders.Dequeue());
+            }
+            Console.WriteLine("WaitressRobot: Orders processed.");
         }
         public void TakeOrder(Client client, Order order)
         {
             orders.Enqueue(order);
-            Console.WriteLine("Order registered, client: Client [name = " +
+            string output = "WaitressRobot: Order registered, client: Client [name = " +
                 client.Name + " happiness = " + client.Happiness +
-                "], order: Order [food = " + order.FoodToOrder + ", extra = " + string.Join(" ", order.ExtrasForAdding));
+                "], order: Order [food = " + order.FoodToOrder + ", extra = " + string.Join(" ", order.ExtrasForAdding);
+            Console.WriteLine(output);
         }
     }
 }

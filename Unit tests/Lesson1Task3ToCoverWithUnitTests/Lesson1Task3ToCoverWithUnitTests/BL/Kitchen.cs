@@ -43,10 +43,12 @@ namespace Lesson1Task3ToCoverWithUnitTests
         public IFood Cook(Order order)
         {
             IFood food;
-            Console.WriteLine($"Preparing food, order: Order[food={order.FoodToOrder}, extras=[" + string.Join(" ", order.ExtrasForAdding) + "]]");
+            Console.WriteLine($"Kitchen: Preparing food, order: Order[food={order.FoodToOrder}, extras=[" + string.Join(" ", order.ExtrasForAdding) + "]]");
             food = CreateMainFood(order.FoodToOrder);
             food = AddExtras(food, order.ExtrasForAdding);
+            Console.WriteLine($"Kitchen: Food prepared, food: " + food.ToString());
             order.NotifyReady(food);
+            
             return food;
         }
     }

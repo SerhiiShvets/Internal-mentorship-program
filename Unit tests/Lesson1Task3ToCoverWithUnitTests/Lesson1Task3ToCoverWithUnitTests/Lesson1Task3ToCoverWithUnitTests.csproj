@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IEatable.cs" />
+    <Compile Include="IWaitressMethods.cs" />
     <Compile Include="Models\Chips.cs" />
     <Compile Include="BL\Client.cs" />
     <Compile Include="Extra.cs" />
