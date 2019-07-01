@@ -19,24 +19,18 @@ namespace TestProject.TaskLibrary.Tasks.Lesson3
                  "Now we are the kids from yesterday"
                 };
             //1
+
+            var wor = strings.Select(s => s.Split(new char[] { ' ' }));
+            
+            Console.WriteLine("The number of words in line " + string.Join(" ", wor));
+
             for (int i = 0; i < strings.Length; i++)
             {
                 Console.Write($"The number of words in the string *{strings[i]}* is equal to ");
                 CalculateTheNumberOfWordsInEachSentence(strings[i]);
             }
             //2
-            var listOfWords = new List<string>();
-            foreach (string s in strings)
-            {
-                var splitString = s.Split(new char[] { ' ' });
-                listOfWords.AddRange(splitString);
-            }
-            var arrayOfWords = new string[listOfWords.Count];
-
-            for (int i = 0; i < arrayOfWords.Length; i++)
-            {
-                arrayOfWords[i] = listOfWords[i];
-            }
+            var arrayOfWords = strings.SelectMany(x => x.Split(new char[] { ' ' }));
 
             IEnumerable<string> wordsThatStartWithVowels =  from word
                                                             in arrayOfWords

@@ -10,11 +10,13 @@ namespace Lesson1Task3ToCoverWithUnitTests
     {
         static void Main(string[] args)
         {
+            var logger = new Logger();
+
             Client client1 = new Client(100, "Peter");
             Client client2 = new Client(200, "Berci");
 
-            client1.Order = new Order("CHIPS", new List<string> { "MUSTARD" });
-            client2.Order = new Order("HOTDOG", new List<string> { "KETCHUP" });
+            client1.Order = new Order("CHIPS", new List<string> { "MUSTARD" }, logger);
+            client2.Order = new Order("HOTDOG", new List<string> { "KETCHUP" }, logger);
 
             client1.Subscribe(client1.Order);
             client2.Subscribe(client2.Order);
@@ -24,7 +26,7 @@ namespace Lesson1Task3ToCoverWithUnitTests
             dictOfClients.Add(2, client2);
 
             Kitchen kitchen = new Kitchen();
-            Waitress waitressRobot = new Waitress(kitchen);
+            Waitress waitressRobot = new Waitress(kitchen, logger);
 
             //Order order1 = new Order("CHIPS", new List<string> { "MUSTARD" });
             //Order order2 = new Order("HOTDOG", new List<string> { "KETCHUP" });
@@ -46,4 +48,18 @@ namespace Lesson1Task3ToCoverWithUnitTests
             Console.ReadKey();
         }
     }
+
+    public interface ILogger
+    {
+        void Write(string text);
+    }
+
+    public class Logger:ILogger
+    {
+        public void Write(string text)
+        {
+            Console.WriteLine(text);
+        }
+    }
+
 }

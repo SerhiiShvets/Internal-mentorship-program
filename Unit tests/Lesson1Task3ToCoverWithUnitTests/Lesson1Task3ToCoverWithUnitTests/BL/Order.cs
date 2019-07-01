@@ -12,12 +12,24 @@ namespace Lesson1Task3ToCoverWithUnitTests
 
         public string FoodToOrder { get; set; }
 
+        private ILogger _logger;
+
+
         //While using EventHandler<FoodReadyEventArgs> event, as required,  we dont need to use this delegate
         //public delegate void EventHandler<FoodReadyEventArgs> (object sender, FoodReadyEventArgs e);
 
         public event EventHandler<FoodReadyEventArgs> FoodReady;
 
-        public virtual void OnFoodReady(FoodReadyEventArgs e)
+        protected virtual void OnFoodReady(FoodReadyEventArgs e)
+        {
+            EventHandler<FoodReadyEventArgs> handler = FoodReady;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        protected virtual void OnFoodReadyForTest(FoodReadyEventArgs e)
         {
             EventHandler<FoodReadyEventArgs> handler = FoodReady;
             if (handler != null)
@@ -28,14 +40,15 @@ namespace Lesson1Task3ToCoverWithUnitTests
 
         public void NotifyReady(IFood food)
         {
-            Console.WriteLine($"Order: Notifying observers of Order: [food={FoodToOrder}, extras=" + string.Join(" ", ExtrasForAdding) + "]");
+            _logger.Write($"Order: Notifying observers of Order: [food={FoodToOrder}, extras=" + string.Join(" ", ExtrasForAdding) + "]");
             OnFoodReady(new FoodReadyEventArgs(food));
-            Console.WriteLine("Order: Notification done");
+            _logger.Write("Order: Notification done");
         }
-        public Order(string food, IEnumerable<string> extras)
+        public Order(string food, IEnumerable<string> extras, ILogger logger)
         {
             ExtrasForAdding = extras;
             FoodToOrder = food;
+            _logger = logger;
         }
     }
 }

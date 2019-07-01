@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Lesson1Task3ToCoverWithUnitTests
 {
-    public interface IWaitressMethods
+    public interface IEvent
     {
-        void TakeOrder(Client client, Order order);
-        void ServeOrders();
+        event EventHandler<FoodReadyEventArgs> ev;
     }
 }

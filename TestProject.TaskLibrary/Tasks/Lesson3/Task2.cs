@@ -49,7 +49,7 @@ namespace TestProject.TaskLibrary.Tasks.Lesson3
                 + string.Join("\n", employeesSortedAscending));
             //4
             var distinctSalariesEmployees = employees.OrderBy(e => e.Salary)
-                                                     .OrderBy(e => e.Name)
+                                                     .ThenBy(e => e.Name)
                                                      .GroupBy(e => e.Salary)
                                                      .Where(g => g.Count() > 1)
                                                      .SelectMany(g => g);
@@ -58,6 +58,19 @@ namespace TestProject.TaskLibrary.Tasks.Lesson3
        + string.Join("\n", distinctSalariesEmployees));
 
             //5
+            var ytyt = employees.Select(x => new
+            {
+                Group = x.Salary > 200 && x.Salary < 400
+                        ? "200-399"
+                        : x.Salary < 600
+                            ? "2"
+                            : x.Salary < 800
+                                ? "3"
+                                : "skip",
+                Name = x.Name
+            }).GroupBy(x => x.Group).Where(x => x.Key != "skip");
+
+
             var groupedSalariesFrom200To399 = employees.Where(e => e.Salary >= 200 && e.Salary < 400)
                                                        .GroupBy(e => e.Name)
                                                        .SelectMany(g => g);
@@ -79,6 +92,10 @@ namespace TestProject.TaskLibrary.Tasks.Lesson3
                + string.Join("\n", groupedSalariesFrom600To799));
             Console.WriteLine(""
                + string.Join("\n", groupedSalariesFrom800To999));
+
+
+            Console.WriteLine(""
+               + string.Join("\n", ytyt));
         }
     }
 }

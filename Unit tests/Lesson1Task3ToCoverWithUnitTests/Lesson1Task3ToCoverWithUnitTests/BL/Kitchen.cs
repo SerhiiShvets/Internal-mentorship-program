@@ -8,6 +8,7 @@ namespace Lesson1Task3ToCoverWithUnitTests
 {
     public class Kitchen
     {
+        private ILogger logger;
         public IFood mainFood;
         public IFood extrasToAdd;
 
@@ -40,13 +41,13 @@ namespace Lesson1Task3ToCoverWithUnitTests
             return result;
         }
 
-        public IFood Cook(Order order)
+        public IFood Cook(Order order, ILogger logger)
         {
             IFood food;
-            Console.WriteLine($"Kitchen: Preparing food, order: Order[food={order.FoodToOrder}, extras=[" + string.Join(" ", order.ExtrasForAdding) + "]]");
+            logger.Write($"Kitchen: Preparing food, order: Order[food={order.FoodToOrder}, extras=[" + string.Join(" ", order.ExtrasForAdding) + "]]");
             food = CreateMainFood(order.FoodToOrder);
             food = AddExtras(food, order.ExtrasForAdding);
-            Console.WriteLine($"Kitchen: Food prepared, food: " + food.ToString());
+            logger.Write($"Kitchen: Food prepared, food: " + food.ToString());
             order.NotifyReady(food);
             
             return food;
