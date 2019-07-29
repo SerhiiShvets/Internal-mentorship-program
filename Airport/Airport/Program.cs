@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
+using System.Device.Location;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Json;
 using Airports.Models;
 using System.Globalization;
-using ISO3166;
 using Newtonsoft.Json;
-using System.Threading;
 using NLog;
 
 
@@ -19,134 +15,97 @@ namespace Airports
 {
     class Program
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-      
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args)
         {
 
             CultureInfo ciEn = new CultureInfo("en-US");
             CultureInfo ciHu = new CultureInfo("hu-HU");
-            Thread.CurrentThread.CurrentCulture = ciEn;
-            Thread.CurrentThread.CurrentUICulture = ciEn;
+            CultureInfo.CurrentCulture = ciEn;
+            CultureInfo.CurrentUICulture = ciEn;
 
             string[] readFile = File.ReadAllLines(@"C:\Users\Сергій\Desktop\EPAM\Internal\Lesson 4 Common .NET Techniques\airports.dat");
-
-            //var correctedReadFile = readFile
-            //                        .Select(x => x.Replace("\"", string.Empty));
-            
-            var correctedReadFile = readFile
-                                    .Select(x => Regex.Replace(x, "['\"]", string.Empty));
-
-            var splittedCorrectedReadFile = correctedReadFile
-                                            .Select(x => x.Split(new char[] { ',' }).ToArray());           
-           
-            var dictOfLocations = new Dictionary<int, Location>();
-
-            var countries = splittedCorrectedReadFile
-                            .OrderBy(x => x[3])
-                            .Select(x => x[3])
-                            .Distinct()
-                            .ToArray();
-
-            var cities = splittedCorrectedReadFile
-                         .OrderBy(x => x[2])
-                         .Select(x => x[2])
-                         .Distinct()
-                         .ToArray();
-
-            //Parsing of the countries
-            var dictOfCountries = CreateDictionaryOfCountries(countries, _logger);
-
-            var distinctCitiesWithCountries = (from everyString in splittedCorrectedReadFile
-                                               orderby everyString[2]
-                                               //At the very beginning it was an anonymous type but I wasnt sure it was a good idea
-                                               //to pass an anonymous type into a method as a parameter. 
-                                               //So I created CityWithCountry class. But I still have doubts about it
-                                               select new CityWithCountry
-                                               {
-                                                   CityName = everyString[2],
-                                                   CountryName = everyString[3],
-                                                   CountryId = (from country in dictOfCountries
-                                                                where country.Value.Name == everyString[3]
-                                                                select country.Value.Id)
-                                                                .FirstOrDefault()
-                                               })
-                                               .Distinct()
-                                               .ToArray();
-            string type = distinctCitiesWithCountries.GetType().ToString();
-            //var count = distinctCitiesWithCountries.Count();
-
-            //Parcing of the cities
-            var dictOfCities = CreateDictionaryOfCities(distinctCitiesWithCountries, _logger);
 
             //retrieving data from timezones.json
             List<Models.TimeZoneInfo> allTimeZoneInfo = JsonConvert.DeserializeObject<List<Models.TimeZoneInfo>>
                 (File.ReadAllText(@"C:\Users\Сергій\Desktop\EPAM\Internal\Lesson 4 Common .NET Techniques\Airport\Airport\bin\Debug\netcoreapp2.1\timezoneinfo.json"));
 
-            //Parsing of the airports
-            var dictOfAirports = CreateDictionaryOfAirports
-                (splittedCorrectedReadFile, dictOfCountries, allTimeZoneInfo, dictOfCities, _logger);
+            //var correctedReadFile = readFile
+            //                        .Select(x => x.Replace("\"", string.Empty));
 
-            //An assigning of timezones to cities
-            AssignTimeZonesToCities(dictOfCities, dictOfAirports, _logger);
-                   
-            //Serialization
-            Serialize(dictOfCities, "cities.json");
-            Serialize(dictOfCountries, "countries.json");
-            Serialize(dictOfAirports, "airports.json");
+            var splittedCorrectedReadFile = readFile
+                                    .Select(x => Regex.Replace(x, "['\"]", string.Empty).Split(new char[] { ',' }));
 
-            var listOfCountriesByNameWithNumberOfAirports = from data in splittedCorrectedReadFile
-                                                            orderby data[3]
-                                                            select new { Country = data[3], };
-           
+            var allAirportInfo = splittedCorrectedReadFile
+                                              .Select(x => new
+                                              {
+                                                  AirportId = Convert.ToInt32(x[0]),
+                                                  AirportName = x[1],
+                                                  CityName = x[2],
+                                                  CountryName = x[3],
+                                                  IATACode = x[4],
+                                                  ICAOCode = x[5],
+                                                  Latitude = Convert.ToDouble(x[6]),
+                                                  Longtitude = Convert.ToDouble(x[7]),
+                                                  Altitude = Convert.ToDouble(x[8])
+                                              }).ToList();
+
+            //var splittedCorrectedReadFile = correctedReadFile
+            //                                .Select(x => x.Split(new char[] { ',' }).ToArray());
 
 
+            var airportsSelectedData = new List<RetrievedAirportData>();
+            
+            try
+            {
+                airportsSelectedData = allAirportInfo.Join(allTimeZoneInfo,
+                                       s => Convert.ToInt32(s.AirportId),
+                                       a => a.AirportId,
+                                       (s, a) => new RetrievedAirportData
+                                       (s.AirportId,
+                                       s.AirportName,
+                                       s.CityName,
+                                       s.CountryName,
+                                       s.IATACode,
+                                       s.ICAOCode,
+                                       Convert.ToDouble(s.Latitude),
+                                       Convert.ToDouble(s.Longtitude),
+                                       Convert.ToDouble(s.Altitude),
+                                       a.TimeZoneInfoId))
+                                      .ToList();
+            }
+            catch(Exception ex)
+            {
+                logger.Error(ex, ex.Message);
+            }
 
+            AddWordAirportToAirportNamesIfNeeded(airportsSelectedData);
 
-            //var countriesWithoutCode = dictOfCountries.Select(x => x.Value)
-            //                                          .Where(x => x.TwoLetterISOCode == null)
-            //                                          .Select(x =>x);
+            var countries = GetCountries(airportsSelectedData);
 
-            //var twoLetterCodesOfCultures = (from cltrInf in  CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-            //                                select cltrInf.TwoLetterISOLanguageName.ToUpper()).Distinct();
+            var cities = GetCities(airportsSelectedData, countries);
 
-            //for (int i = 0; i < twoLetterCodesOfCultures.Count(); i++)
-            //{
-            //    string regionInfoEnglishName = twoLetterCodesOfCultures.ElementAt(i);
-                
-            //    CultureInfo cultureInfo = new CultureInfo(regionInfoEnglishName);
-         
-
-            //    try
-            //    {
-            //        RegionInfo regionInfo = new RegionInfo(cultureInfo.LCID);
-            //        dictOfCountries.Add(i, new Models.Country
-            //        {
-            //            Id = i,
-            //            Name = countries.ElementAt(i),
-            //            TwoLetterISOCode = regionInfo.TwoLetterISORegionName,
-            //            ThreeLetterISOCode = regionInfo.ThreeLetterISORegionName
-            //        });
-            //    }
-            //    catch { }    
-            //}
-
-            //var query = dictOfCountries.Select(x => x.Value)
-            //                                .Select(x => x.TwoLetterISOCode);
-            //var anonymousObjects = new Dictionary<int, object>();
-
-           
+            var airports = GetAirports(airportsSelectedData, cities);
 
             
+            //Serialization
+            Serialize(cities, "cities.json");
+            Serialize(countries, "countries.json");
+            Serialize(airports, "airports.json");
 
-          
+            var listOfCountriesByNameWithNumberOfAirports = airportsSelectedData
+                                                            .OrderBy(x => x.CountryName)
+                                                            .GroupBy(x => x.CountryName)
+                                                            .Select(x => new {
+                                                                                CountryName = x.Key,
+                                                                                NumberOfAirports = x.Count()
+                                                                             });
 
-            //foreach (KeyValuePair<int, object> anObject in anonymousObjects)
-            //{
-            //    airports.Add(new Airport { Id = anObject. });
-            //}
+            var citiesWhichHaveTheMostAirports = (airportsSelectedData.GroupBy(x => new { CityName = x.CityName, CountryName = x.CountryName }))
+                                                 .OrderByDescending(x => x.Count());
+
+
 
 
             Console.ReadKey();
@@ -164,184 +123,149 @@ namespace Airports
             return false;
         }
 
-        public static List<RegionInfo> GetCountriesByIso3166()
+        public static void AddWordAirportToAirportNamesIfNeeded(List<RetrievedAirportData> retrievedAirportData)
         {
-            List<RegionInfo> countries = new List<RegionInfo>();
-            foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.SpecificCultures))
+            foreach (var s in retrievedAirportData)
             {
-                RegionInfo country = new RegionInfo(culture.LCID);
-                if (countries.Where(p => p.Name == country.Name).Count() == 0)
-                    countries.Add(country);
-            }
-            return countries.OrderBy(p => p.EnglishName).ToList();
-        }
-
-        public static List<RegionInfo> GetCountriesByCode(List<string> codes)
-        {
-            List<RegionInfo> countries = new List<RegionInfo>();
-            if (codes != null && codes.Count > 0)
-            {
-                foreach (string code in codes)
+                if (!s.AirportName.EndsWith("Airport"))
                 {
-                    try
-                    {
-                        countries.Add(new RegionInfo(code));
-                    }
-                    catch
-                    {
-                       
-                    }
-                }
-            }
-            return countries.OrderBy(p => p.EnglishName).ToList();
-        }
-
-        public static void Serialize<T>(Dictionary<int, T> dictionary, string nameOfFileToCreate)
-        {
-            var array = dictionary.Values.ToArray();
-            DataContractJsonSerializer formatter = new DataContractJsonSerializer(typeof(T[]));
-            using (FileStream fs = new FileStream(nameOfFileToCreate, FileMode.OpenOrCreate))
-            {
-                formatter.WriteObject(fs, array);
-            }
-
-        }
-
-        public static Dictionary<int, Airport> CreateDictionaryOfAirports
-            (IEnumerable<string[]> readFile, Dictionary<int, Models.Country> countries,
-            List<Models.TimeZoneInfo> tzInfo, Dictionary<int, City> cities, Logger logger)
-        {
-            var dictOfAirports = new Dictionary<int, Airport>();
-
-            foreach (string[] s in readFile)
-            {
-                try
-                {
-                    var ap = new
-                    {
-                        ID = s[0],
-                        AirportName = s[1] + "Airport",
-                        CityName = s[2],
-                        CountryName = s[3],
-                        IATACode = s[4],
-                        ICAOCode = s[5],
-                        Latitude = s[6],
-                        Longtitude = s[7],
-                        Altitude = s[8],
-                        CountryyId = countries
-                                     .Where(x => x.Value.Name == s[3])
-                                     .Select(x => x.Value.Id)
-                                     .First(),
-                        TimeZoneName = tzInfo
-                                       .Where(x => x.AirportId == Convert.ToInt32(s[0]))
-                                       .Select(x => x.TimeZoneInfoId)
-                                       .FirstOrDefault(),
-                    };
-                    dictOfAirports.Add(Convert.ToInt32(ap.ID), new Airport
-                    {
-                        Id = Convert.ToInt32(ap.ID),
-                        CountryyId = ap.CountryyId,
-                        CityId = cities
-                                .Where(x => x.Value.Name == ap.CityName)
-                                .Select(x => x.Value.Id)
-                                .FirstOrDefault(),
-                        Name = s[1],
-                        IATACode = ap.IATACode,
-                        ICAOCode = ap.ICAOCode,
-                        FullName = ap.AirportName,
-                        TimeZoneName = ap.TimeZoneName,
-                        Location = new Location
-                        {
-                            Latitude = Convert.ToDouble(ap.Latitude),
-                            Longtitude = Convert.ToDouble(ap.Longtitude),
-                            Altitude = Convert.ToDouble(ap.Altitude),
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    logger.Error(ex, ex.Message);
-                }
-
-            }
-            return dictOfAirports;
-        }
-        public static void AssignTimeZonesToCities(Dictionary<int, City> cities, Dictionary<int, Airport> airports, Logger logger)
-        {
-            foreach (var kv in cities.Values)
-            {
-                try
-                {
-                    kv.TimeZoneName = airports
-                                      .Where(x => x.Value.CityId == kv.Id)
-                                      .Select(x => x.Value.TimeZoneName)
-                                      .First();
-                }
-                catch(Exception ex)
-                {
-                    logger.Error(ex, ex.Message);
+                    s.AirportName = s.AirportName + " Airport";
                 }
             }
         }
 
-        public static Dictionary<int, City> CreateDictionaryOfCities(CityWithCountry[] distinctCitiesWithCountries, Logger logger)
-        {
-            var dictOfCities = new Dictionary<int, City>();
-
-            try
-            {
-                for (int i = 0; i < distinctCitiesWithCountries.Length; i++)
-                {
-                    dictOfCities.Add(i, new City
-                    {
-                        Id = i,
-                        Name = distinctCitiesWithCountries[i].CityName,
-                        CounryId = distinctCitiesWithCountries[i].CountryId,
-                    });
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error(ex, ex.Message);
-            }
-            return dictOfCities;
-        }
-
-        public static Dictionary<int, Models.Country> CreateDictionaryOfCountries(string[] countries, Logger logger)
+        public static List<Models.Country> GetCountries(List<RetrievedAirportData> data)
         {
             var allCountriesISO3166Data = ISO3166.Country.List;
-            var dictOfCountries = new Dictionary<int, Models.Country>();
-            try
-            {
-                for (int i = 0; i < countries.Length; i++)
-                {
-                    if (countries.Contains(allCountriesISO3166Data.Select(x => x.Name).ElementAt(i)))
-                    {
-                        dictOfCountries.Add(i, new Models.Country
-                        {
-                            Id = i,
-                            Name = allCountriesISO3166Data.Select(x => x.Name).ElementAt(i),
-                            TwoLetterISOCode = allCountriesISO3166Data.Select(x => x.TwoLetterCode).ElementAt(i),
-                            ThreeLetterISOCode = allCountriesISO3166Data.Select(x => x.ThreeLetterCode).ElementAt(i)
-                        });
-                    }
-                    else
-                    {
-                        dictOfCountries.Add(i, new Models.Country
-                        {
-                            Id = i,
-                            Name = countries[i],
+            List<string> countries = data
+                            .OrderBy(x => x.CountryName)
+                            .Select(x => x.CountryName)
+                            .Distinct()
+                            .ToList();
 
-                        });
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error(ex, ex.Message);
-            }
-            return dictOfCountries;
+            var listOfCountries = countries
+                                  .Select(x => new Models.Country
+                                  {
+                                      Id = countries.IndexOf(x),
+                                      Name = x,
+                                      TwoLetterISOCode = allCountriesISO3166Data.Select(y => y.TwoLetterCode).ElementAt(countries.IndexOf(x)),
+                                      ThreeLetterISOCode = allCountriesISO3166Data.Select(y => y.ThreeLetterCode).ElementAt(countries.IndexOf(x))
+                                  })
+                                  .ToList();
+            return listOfCountries;
         }
 
+        public static List<City> GetCities(IEnumerable<RetrievedAirportData> data, List<Models.Country> listOfCountries)
+        {
+            var cities = data
+                         .OrderBy(x => x.CityName)
+                         .Select(x => x.CityName)
+                         .Distinct()
+                         .ToList();
+
+            var countries = data
+                            .OrderBy(x => x.CountryName)
+                            .Select(x => x.CountryName)
+                            .Distinct()
+                            .ToList();
+
+            var query = data.Join(countries,
+                                  d => d.CountryName,
+                                  c => c,
+                                  (d, c) => new {
+                                      CountryName = d.CountryName,
+                                      CityName = d.CityName,
+                                      CountryId = countries.IndexOf(d.CountryName),
+                                      TimeZoneInfoId = d.TimeZoneInfoId
+                                  });
+
+            var listOfCities = cities.Join(query,
+                                      c => c,
+                                      q => q.CityName,
+                                      (c, q) => new City
+                                      {
+                                          Id = cities.IndexOf(c),
+                                          Name = c,
+                                          CountryId = q.CountryId,
+                                          TimeZoneInfoId = q.TimeZoneInfoId
+                                      })
+                                     .ToList();
+            return listOfCities;
+        }
+
+        public static List<Airport> GetAirports(IEnumerable<RetrievedAirportData> data, List<City> cities)
+        {
+            var listOfAirports = new List<Airport>();
+
+            listOfAirports = data.Join(cities,
+                                    d => d.CityName,
+                                    c => c.Name,
+                                    (d, c) => new Airport
+                                    {
+                                        Id = d.AirportId,
+                                        CityId = c.Id,
+                                        CountryyId = c.CountryId,
+                                        FullName = d.AirportName,
+                                        IATACode = d.IATACode,
+                                        ICAOCode = d.ICAOCode,
+                                        Location = d.Location,
+                                        TimeZoneInfoId = d.TimeZoneInfoId,
+                                        Name = d.AirportName
+                                    })
+                                    .ToList();
+
+            return listOfAirports;
+        }
+
+        public static void Serialize<T>(List<T> list, string nameOfFileToCreate)
+        {
+            DataContractJsonSerializer formatter = new DataContractJsonSerializer(typeof(List<T>));
+            using (FileStream fs = new FileStream(nameOfFileToCreate, FileMode.OpenOrCreate))
+            {
+                formatter.WriteObject(fs, list);
+            }
+        }
+
+        public static string GetClosestAirport(IEnumerable<RetrievedAirportData> data)
+        {
+            Console.WriteLine("Input Latitude, please (between -90 and 90)");
+            string latitude = Console.ReadLine();
+
+            Console.WriteLine("Input Longtitude, please (between -180 and 180)");
+            string longtitude = Console.ReadLine();
+
+            string result = "";
+
+            if (Double.TryParse(latitude, out double checkedLatitude) && Double.TryParse(longtitude, out double checkedLongtitude))
+            {
+                var firstCoordinate = new GeoCoordinate(checkedLatitude, checkedLongtitude);
+                var locationsAndDistancesToInputPoint = data
+                                .Select(x => new
+                                {
+                                    Name = x.AirportName,
+                                    City = x.CityName,
+                                    DistanceToInputPoint = firstCoordinate.GetDistanceTo(new GeoCoordinate(x.Location.Latitude, x.Location.Longtitude))
+                                });
+
+                var closestDistance = locationsAndDistancesToInputPoint
+                                     .OrderBy(x => x.DistanceToInputPoint)
+                                     .Select(x => x)
+                                     .First();
+                result = $"The closest airpot is {closestDistance.Name} in {closestDistance.City}, {closestDistance.DistanceToInputPoint}km";
+                return result;
+            }
+            else
+            {
+                Console.WriteLine("Input data is not valid");
+                return result;
+            }
+
+
+        }
     }
 }
+
+
+//airportsSelectedData = from s in splittedCorrectedReadFile
+//                                           join a in allTimeZoneInfo on Convert.ToInt32(s[0]) equals a.AirportId
+//                                           select new RetrievedAirportData{ AirportId = Convert.ToInt32(s[0]), AirportName = s[1] + " Airport", CityName = s[2], CountryName = s[3], IATACode = s[4], ICAOCode = s[5], Latitude = Convert.ToDouble(s[6]), Longtitude = Convert.ToDouble(s[7]), Altitude = Convert.ToInt32(s[8]), a.TimeZoneInfoId };

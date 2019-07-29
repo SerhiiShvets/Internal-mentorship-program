@@ -14,8 +14,8 @@ namespace Airports.Models
         [DataMember]
         public string Name { get; set; }
         [DataMember]
-        public int CounryId { get; set; }
+        public int CountryId { get; set; }
         [DataMember]
-        public string TimeZoneName { get; set; }
+        public string TimeZoneInfoId { get; set; }
     }
 }
