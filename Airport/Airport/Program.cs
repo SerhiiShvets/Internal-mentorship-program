@@ -259,8 +259,6 @@ namespace Airports
                 Console.WriteLine("Input data is not valid");
                 return result;
             }
-
-
         }
     }
 }
