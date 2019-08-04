@@ -5,17 +5,19 @@ using System.IO;
 using System.Device.Location;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Json;
-using Airports.Models;
 using System.Globalization;
 using Newtonsoft.Json;
 using NLog;
-
+using Airports.Services;
+using Airports.Models;
 
 namespace Airports
 {
     class Program
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        // For some reason this dataRaederService does not work
+        public DataReaderService dataReaderService = new DataReaderService();
 
         static void Main(string[] args)
         {
@@ -25,57 +27,22 @@ namespace Airports
             CultureInfo.CurrentCulture = ciEn;
             CultureInfo.CurrentUICulture = ciEn;
 
-            string[] readFile = File.ReadAllLines(@"C:\Users\Сергій\Desktop\EPAM\Internal\Lesson 4 Common .NET Techniques\airports.dat");
+            DataReaderService dataReaderService = new DataReaderService();
+            //retrieving data from airports.dat
+            var airportsReadFile = dataReaderService.ReadAirportsDat();
 
             //retrieving data from timezones.json
-            List<Models.TimeZoneInfo> allTimeZoneInfo = JsonConvert.DeserializeObject<List<Models.TimeZoneInfo>>
-                (File.ReadAllText(@"C:\Users\Сергій\Desktop\EPAM\Internal\Lesson 4 Common .NET Techniques\Airport\Airport\bin\Debug\netcoreapp2.1\timezoneinfo.json"));
+            var allTimeZoneInfo = dataReaderService.ReadTimeZoneInfoJson();
 
-            //var correctedReadFile = readFile
-            //                        .Select(x => x.Replace("\"", string.Empty));
-
-            var splittedCorrectedReadFile = readFile
-                                    .Select(x => Regex.Replace(x, "['\"]", string.Empty).Split(new char[] { ',' }));
-
-            var allAirportInfo = splittedCorrectedReadFile
-                                              .Select(x => new
-                                              {
-                                                  AirportId = Convert.ToInt32(x[0]),
-                                                  AirportName = x[1],
-                                                  CityName = x[2],
-                                                  CountryName = x[3],
-                                                  IATACode = x[4],
-                                                  ICAOCode = x[5],
-                                                  Latitude = Convert.ToDouble(x[6]),
-                                                  Longtitude = Convert.ToDouble(x[7]),
-                                                  Altitude = Convert.ToDouble(x[8])
-                                              }).ToList();
-
-            //var splittedCorrectedReadFile = correctedReadFile
-            //                                .Select(x => x.Split(new char[] { ',' }).ToArray());
-
+            var splittedAirportsData = dataReaderService.SplitAirportsData(airportsReadFile);
 
             var airportsSelectedData = new List<RetrievedAirportData>();
-            
+
             try
             {
-                airportsSelectedData = allAirportInfo.Join(allTimeZoneInfo,
-                                       s => Convert.ToInt32(s.AirportId),
-                                       a => a.AirportId,
-                                       (s, a) => new RetrievedAirportData
-                                       (s.AirportId,
-                                       s.AirportName,
-                                       s.CityName,
-                                       s.CountryName,
-                                       s.IATACode,
-                                       s.ICAOCode,
-                                       Convert.ToDouble(s.Latitude),
-                                       Convert.ToDouble(s.Longtitude),
-                                       Convert.ToDouble(s.Altitude),
-                                       a.TimeZoneInfoId))
-                                      .ToList();
+                airportsSelectedData = dataReaderService.GetAirportInfo(splittedAirportsData);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error(ex, ex.Message);
             }
@@ -88,7 +55,6 @@ namespace Airports
 
             var airports = GetAirports(airportsSelectedData, cities);
 
-            
             //Serialization
             Serialize(cities, "cities.json");
             Serialize(countries, "countries.json");
@@ -97,10 +63,11 @@ namespace Airports
             var listOfCountriesByNameWithNumberOfAirports = airportsSelectedData
                                                             .OrderBy(x => x.CountryName)
                                                             .GroupBy(x => x.CountryName)
-                                                            .Select(x => new {
-                                                                                CountryName = x.Key,
-                                                                                NumberOfAirports = x.Count()
-                                                                             });
+                                                            .Select(x => new
+                                                            {
+                                                                CountryName = x.Key,
+                                                                NumberOfAirports = x.Count()
+                                                            });
 
             var citiesWhichHaveTheMostAirports = (airportsSelectedData.GroupBy(x => new { CityName = x.CityName, CountryName = x.CountryName }))
                                                  .OrderByDescending(x => x.Count());
@@ -109,18 +76,7 @@ namespace Airports
 
 
             Console.ReadKey();
-            
-        }
 
-        private static bool FilesPresent(string dataFileDirectoryPath)
-        {
-            IEnumerable<string> dirs = Directory.EnumerateDirectories(dataFileDirectoryPath, "*.*", SearchOption.TopDirectoryOnly);
-            foreach (string d in dirs)
-            {
-                IEnumerable<string> files = Directory.EnumerateFiles(d, "*.*", SearchOption.AllDirectories);
-                if (files.Any()) { return true; }
-            }
-            return false;
         }
 
         public static void AddWordAirportToAirportNamesIfNeeded(List<RetrievedAirportData> retrievedAirportData)

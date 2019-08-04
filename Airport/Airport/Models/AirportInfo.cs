@@ -6,23 +6,23 @@ namespace Airports.Models
 {
     public class AirportInfo
     {
-        string AirportId { get; set; }
-        string AirportName { get; set; }
-        string CityName { get; set; }
-        string CountryName { get; set; }
-        string IATACode { get; set; }
-        string ICAOCode { get; set; }
-        string Latitude { get; set; }
-        string Longtitude { get; set; }
-        string Altitude { get; set; }
+        public int AirportId { get; set; }
+        public string AirportName { get; set; }
+        public string CityName { get; set; }
+        public string CountryName { get; set; }
+        public string IATACode { get; set; }
+        public string ICAOCode { get; set; }
+        public double Latitude { get; set; }
+        public double Longtitude { get; set; }
+        public double Altitude { get; set; }
 
         public AirportInfo()
         {
 
         }
 
-        public AirportInfo(string id, string airportName, string cityName, string countrytName, string iataCode,
-                                    string icaoCode, string latitude, string longtitude, string altitude)
+        public AirportInfo(int id, string airportName, string cityName, string countrytName, string iataCode,
+                                    string icaoCode, double latitude, double longtitude, double altitude)
         {
             AirportId = id;
             AirportName = airportName;
